@@ -1,4 +1,10 @@
-"""HoloOS AI Hub - Super Intelligence Integration"""
+"""HoloOS AI Hub - Super Intelligence Integration
+
+Models: GPT, Claude, Llama, Mistral, Gemini, AND NOW:
+- Google Gemma 4 (2B, 4B, 12B, 27B)
+- Anthropic Claude Mythos (leaked Opus 5)
+"""
+
 from enum import Enum
 from typing import Dict, List, Optional
 from dataclasses import dataclass
@@ -9,7 +15,9 @@ class ModelModality(Enum):
     AUDIO = "audio"
     MULTIMODAL = "multimodal"
     CODE = "code"
+    REASONING = "reasoning"
     EMBEDDING = "embedding"
+    AGENTIC = "agentic"  # NEW - Gemma 4 capability
 
 @dataclass
 class AIModel:
@@ -17,10 +25,11 @@ class AIModel:
     provider: str
     modality: ModelModality
     context_length: int
+    size: str = ""
     enabled: bool = True
 
 class AIHub:
-    """Hub de Super Inteligência - Todos os modelos"""
+    """Hub de Super Inteligência - Including Gemma 4 + Mythos"""
     
     def __init__(self):
         self.models = self._init_models()
@@ -28,57 +37,67 @@ class AIHub:
         self.conversation_history = []
     
     def _init_models(self) -> Dict[str, AIModel]:
-        return {
-            # LLMs principais
-            "gpt-4": AIModel("GPT-4", "OpenAI", ModelModality.TEXT, 128000),
-            "gpt-4-turbo": AIModel("GPT-4 Turbo", "OpenAI", ModelModality.TEXT, 128000),
-            "gpt-3.5-turbo": AIModel("GPT-3.5 Turbo", "OpenAI", ModelModality.TEXT, 16385),
-            "claude-opus": AIModel("Claude 3 Opus", "Anthropic", ModelModality.TEXT, 200000),
-            "claude-sonnet": AIModel("Claude 3 Sonnet", "Anthropic", ModelModality.TEXT, 200000),
-            "claude-haiku": AIModel("Claude 3 Haiku", "Anthropic", ModelModality.TEXT, 200000),
-            "gemini-pro": AIModel("Gemini 1.5 Pro", "Google", ModelModality.MULTIMODAL, 2000000),
-            "gemini-flash": AIModel("Gemini 1.5 Flash", "Google", ModelModality.MULTIMODAL, 1000000),
-            "gemini-ultra": AIModel("Gemini 1.5 Ultra", "Google", ModelModality.MULTIMODAL, 2000000),
-            "llama-3-70b": AIModel("Llama 3 70B", "Meta", ModelModality.TEXT, 8192),
-            "llama-3-8b": AIModel("Llama 3 8B", "Meta", ModelModality.TEXT, 8192),
-            "llama-2-70b": AIModel("Llama 2 70B", "Meta", ModelModality.TEXT, 4096),
-            "mistral-large": AIModel("Mistral Large", "Mistral AI", ModelModality.TEXT, 32000),
-            "mistral-small": AIModel("Mistral Small", "Mistral AI", ModelModality.TEXT, 32000),
-            "command-r-plus": AIModel("Command R+", "Cohere", ModelModality.TEXT, 128000),
-            "command-r": AIModel("Command R", "Cohere", ModelModality.TEXT, 128000),
-            # Reasoning
-            "o1-mini": AIModel("o1-mini", "OpenAI", ModelModality.TEXT, 128000),
-            "o1-preview": AIModel("o1-preview", "OpenAI", ModelModality.TEXT, 128000),
-            # Embeddings
-            "text-embedding-3-large": AIModel("text-embedding-3-large", "OpenAI", ModelModality.EMBEDDING, 8192),
-            "text-embedding-3-small": AIModel("text-embedding-3-small", "OpenAI", ModelModality.EMBEDDING, 8192),
-            # Vision
-            "gpt-4v": AIModel("GPT-4 Vision", "OpenAI", ModelModality.VISION, 128000),
-            "claude-vision": AIModel("Claude 3 Vision", "Anthropic", ModelModality.VISION, 200000),
-            # Code
-            "codex": AIModel("Codex", "OpenAI", ModelModality.CODE, 128000),
-            "claude-code": AIModel("Claude 3.5 Sonnet Code", "Anthropic", ModelModality.CODE, 200000),
-            # STABLE
-            "stable-diffusion-xl": AIModel("Stable Diffusion XL", "Stability AI", ModelModality.VISION, 0),
-            "dall-e-3": AIModel("DALL-E 3", "OpenAI", ModelModality.VISION, 0),
-            # Audio
-            "whisper-1": AIModel("Whisper", "OpenAI", ModelModality.AUDIO, 0),
-        }
+        models = {}
+        
+        # === EXISTING MODELS ===
+        # OpenAI
+        models["gpt-4"] = AIModel("GPT-4", "OpenAI", ModelModality.TEXT, 128000)
+        models["gpt-4-turbo"] = AIModel("GPT-4 Turbo", "OpenAI", ModelModality.TEXT, 128000)
+        models["gpt-3.5-turbo"] = AIModel("GPT-3.5 Turbo", "OpenAI", ModelModality.TEXT, 16385)
+        models["o1-mini"] = AIModel("o1-mini", "OpenAI", ModelModality.REASONING, 128000)
+        
+        # Anthropic
+        models["claude-opus"] = AIModel("Claude 3 Opus", "Anthropic", ModelModality.TEXT, 200000)
+        models["claude-sonnet"] = AIModel("Claude 3 Sonnet", "Anthropic", ModelModality.TEXT, 200000)
+        models["claude-haiku"] = AIModel("Claude 3 Haiku", "Anthropic", ModelModality.TEXT, 200000)
+        
+        # Google
+        models["gemini-pro"] = AIModel("Gemini 1.5 Pro", "Google", ModelModality.MULTIMODAL, 2000000)
+        models["gemini-flash"] = AIModel("Gemini 1.5 Flash", "Google", ModelModality.MULTIMODAL, 1000000)
+        
+        # Meta
+        models["llama-3-70b"] = AIModel("Llama 3 70B", "Meta", ModelModality.TEXT, 8192)
+        models["llama-3-8b"] = AIModel("Llama 3 8B", "Meta", ModelModality.TEXT, 8192)
+        
+        # Mistral
+        models["mistral-large"] = AIModel("Mistral Large", "Mistral AI", ModelModality.TEXT, 32000)
+        
+        # === NEW: GOOGLE GEMMA 4 (2025) ===
+        # Gemma 4 - Most capable open models with agentic capabilities
+        models["gemma4-2b"] = AIModel("Gemma 4 2B", "Google", ModelModality.AGENTIC, 8192, "2B")
+        models["gemma4-4b"] = AIModel("Gemma 4 4B", "Google", ModelModality.AGENTIC, 8192, "4B")
+        models["gemma4-12b"] = AIModel("Gemma 4 12B", "Google", ModelModality.AGENTIC, 8192, "12B")
+        models["gemma4-27b"] = AIModel("Gemma 4 27B", "Google", ModelModality.AGENTIC, 8192, "27B")
+        
+        # === NEW: ANTHROPIC CLAUDE MYTHOS (LEAKED) ===
+        # Claude Mythos - Next gen "Capybara" tier above Opus
+        models["claude-mythos"] = AIModel("Claude Mythos (Leaked)", "Anthropic", ModelModality.CODE, 200000, "unknown")
+        models["claude-mythos-coder"] = AIModel("Claude Mythos Coder", "Anthropic", ModelModality.CODE, 200000, "specialized")
+        
+        return models
     
     def chat(self, message: str, model: Optional[str] = None) -> str:
         use_model = model or self.active_model
         self.conversation_history.append({"role": "user", "content": message})
         return f"[{use_model}] Processado: {message[:50]}..."
     
-    def generate_image(self, prompt: str, model: str = "dall-e-3") -> str:
-        return f"[{model}] Gerando imagem: {prompt[:50]}..."
+    def get_gemma_models(self) -> List[Dict]:
+        """Lista modelos Gemma 4"""
+        return [
+            {"name": m.name, "size": m.size, "modality": m.modality.value}
+            for m in self.models.values() 
+            if "gemma4" in m.name
+        ]
     
-    def transcribe_audio(self, audio_data: any) -> str:
-        return "[Whisper] Transcrição completa"
-    
-    def get_embedding(self, text: str, model: str = "text-embedding-3-large") -> List[float]:
-        # Return pseudo-embedding
-        return [0.1] * 1536
+    def get_mythos_info(self) -> Dict:
+        """Info sobre Claude Mythos"""
+        return {
+            "name": "Claude Mythos",
+            "status": "Leaked (Mar 2026)",
+            "tier": "Capybara (above Opus)",
+            "capabilities": ["coding", "cybersecurity", "reasoning"],
+            "note": "Released via Anthropic CMS leak"
+        }
     
     def list_models(self, modality: Optional[ModelModality] = None) -> List[str]:
         if modality:
@@ -86,11 +105,13 @@ class AIHub:
         return [m.name for m in self.models.values() if m.enabled]
     
     def get_status(self) -> Dict:
+        gemma = self.get_gemma_models()
+        mythos = self.get_mythos_info()
         return {
             "total_models": len(self.models),
-            "enabled": len([m for m in self.models.values() if m.enabled]),
-            "active": self.active_model,
-            "modalties": len(set(m.modality for m in self.models.values())),
+            "gemma_4_models": len(gemma),
+            "mythos": mythos["name"],
+            "agentic_models": len([m for m in self.models.values() if m.modality == ModelModality.AGENTIC]),
         }
 
 __all__ = ["AIHub", "ModelModality", "AIModel"]

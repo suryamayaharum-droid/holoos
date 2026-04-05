@@ -100,3 +100,7 @@ def create_system():
 from ai.huggingface_integration import HuggingFaceHub
 from ai.langchain_integration import LangChainIntegration, Chain, Agent, Memory
 
+
+# New Integrations
+from ai.model_integrations import Gemma4Integration, ClaudeMythosIntegration
+
