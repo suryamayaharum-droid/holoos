@@ -1,0 +1,28 @@
+{
+  "schema": "meaw.federation-link/v1",
+  "organism": "HARUM-MEAW",
+  "component": "holoos",
+  "repository": "suryamayaharum-droid/holoos",
+  "role": "holographic-os-lab",
+  "organ": "systems-integration-lab",
+  "capabilities": [
+    "quantization",
+    "governance",
+    "distributed-workers",
+    "memory",
+    "plugins",
+    "monitoring"
+  ],
+  "lifecycle": "lab",
+  "trust": "owned",
+  "authority": "suryamayaharum-droid/SARASWATI-HIVE-MIND",
+  "authority_manifest": "ecosystem/repository_organism.json",
+  "nervous_system": "suryamayaharum-droid/ai23",
+  "memory_authority": "MemoryCastle@suryamayaharum-droid/SARASWATI-HIVE-MIND",
+  "policy": {
+    "discovery_executes_commands": false,
+    "manifest_grants_execution": false,
+    "explicit_adapter_required": true,
+    "secrets_allowed": false
+  }
+}
